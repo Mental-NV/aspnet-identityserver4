@@ -1,3 +1,6 @@
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Movies.API.Data;
 namespace Movies.API
 {
     public class Program
@@ -5,6 +8,9 @@ namespace Movies.API
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.AddDbContext<MoviesContext>(options =>
+                    options.UseInMemoryDatabase("Movies"));
 
             // Add services to the container.
 
@@ -14,6 +20,8 @@ namespace Movies.API
             builder.Services.AddSwaggerGen();
 
             var app = builder.Build();
+
+            SeedDatabase(app);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -29,7 +37,19 @@ namespace Movies.API
 
             app.MapControllers();
 
+            
+
             app.Run();
+        }
+
+        private static void SeedDatabase(IHost host)
+        {
+            using (var scope = host.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var moviesContext = services.GetRequiredService<MoviesContext>();
+                MoviesContextSeed.SeedAsync(moviesContext);
+            }
         }
     }
 }
