@@ -37,8 +37,6 @@ namespace Movies.API
 
             app.MapControllers();
 
-            
-
             app.Run();
         }
 
