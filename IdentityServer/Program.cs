@@ -1,5 +1,6 @@
 using IdentityServer4.Models;
 using IdentityServer4.Test;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityServer
 {
@@ -16,12 +17,23 @@ namespace IdentityServer
                 .AddInMemoryApiScopes(Config.ApiScopes)
                 .AddDeveloperSigningCredential();
 
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "https://localhost:5005";
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateAudience = false
+                    };
+                });
+
             var app = builder.Build();
 
             app.UseStaticFiles();
             app.UseRouting();
             app.UseIdentityServer();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 
