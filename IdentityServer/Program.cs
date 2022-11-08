@@ -15,6 +15,8 @@ namespace IdentityServer
             builder.Services.AddIdentityServer()
                 .AddInMemoryClients(Config.Clients)
                 .AddInMemoryApiScopes(Config.ApiScopes)
+                .AddInMemoryIdentityResources(Config.IdentityResources)
+                .AddTestUsers(Config.TestUsers)
                 .AddDeveloperSigningCredential();
 
             var app = builder.Build();
@@ -25,7 +27,10 @@ namespace IdentityServer
 
             app.UseAuthorization();
 
-            app.MapControllers();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapDefaultControllerRoute();
+            });
 
             app.Run();
         }
