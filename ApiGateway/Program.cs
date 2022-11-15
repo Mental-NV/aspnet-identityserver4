@@ -1,3 +1,4 @@
+using Microsoft.IdentityModel.Tokens;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 
@@ -19,18 +20,24 @@ namespace ApiGateway
                 {
                     x.Authority = "https://localhost:5005";
                     // x.RequireHttpsMetadata = false;
+                    x.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
                 });
 
 
             builder.Services.AddOcelot();
             var app = builder.Build();
 
+            app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
             });
 
             await app.UseOcelot();
+            await app.RunAsync();
         }
     }
 }
